@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Kuliah - Sistem Informasi Universitas Terbuka</title>
+  <link rel="icon" type="image/png" href="/source/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="h-screen bg-gray-100 font-sans">
+  <div class="flex h-full">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-72 bg-white border-r border-gray-200 p-4 flex flex-col">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-700 flex items-center justify-center text-white font-bold">FP</div>
+        <div>
+          <div class="text-sm font-semibold">Fauzan Putra</div>
+          <div class="text-xs text-gray-500">Sistem Informasi</div>
+        </div>
+      </div>
+
+      <nav class="flex-1">
+        <ul class="space-y-1">
+          <li>
+            <button data-section="beranda" class="nav-item flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 focus:outline-none">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6"/></svg>
+              <span>Beranda</span>
+            </button>
+          </li>
+
+          <li>
+            <button data-section="profil" class="nav-item flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 focus:outline-none">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.6 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>Profil</span>
+            </button>
+          </li>
+
+          <li>
+            <button data-section="matakuliah" class="nav-item flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 focus:outline-none">
+              <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422A12.042 12.042 0 0118 20.5M12 14L5.84 10.578A12.042 12.042 0 006 20.5"/></svg>
+              <span>Matakuliah</span>
+            </button>
+          </li>        
+          
+          <li>
+            <button data-section="produktivitas" class="nav-item flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 focus:outline-none">
+                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10"/>
+                </svg>
+                <span>Produktivitas</span>
+            </button>
+        </li>
+
+        <li>
+          <button data-section="tugasakhir" class="nav-item flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 focus:outline-none">
+          <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 7h10v10H7z"/></svg>
+          <span>Tugas Akhir</span>
+          </button>
+        </li>
+        </ul>
+      </nav>
+
+      <div class="mt-6 text-xs text-gray-500">
+        <div>Versi UI • v0.1</div>
+        <div class="mt-2">Tip: klik item di sidebar untuk navigasi.</div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 p-6 overflow-auto">
+      <header class="flex items-center justify-between mb-6">
+        <h1 id="page-title" class="text-2xl font-bold text-gray-800">Beranda</h1>
+        <div class="flex items-center gap-4">
+          <button id="mobile-toggle" class="md:hidden px-3 py-2 rounded-lg bg-gray-100">Menu</button>
+        </div>
+      </header>
+
+      <section id="content">
+        <!-- Konten akan di-render oleh JS -->
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ----- SAMPLE DATA (bisa kamu ganti nanti) -----
+    const sampleUser = {
+      nama: 'Fauzan Putra Afandi',
+      tanggal_lahir: '2004-08-28',
+      tempat_lahir: 'Surabaya',
+      angkatan: '2024',
+      jurusan: 'Sistem Informasi',
+      semester: 3,
+      tempat_tinggal: 'Waru',
+      nim: '054528183',
+    };
+
+    const berandaData = {
+      sks_lulus: 36,
+      ipk_akhir: 3.25,
+      ukt_per_semester: [1800000],
+      gradesCount: { A: 7, B: 4, C: 0, D: 1, E: 0 },
+      ipkHistory: [3.08, 3.35]
+    };
+
+    // ----- Helpers -----
+    function qs(sel) { return document.querySelector(sel); }
+    function qsa(sel) { return document.querySelectorAll(sel); }
+
+    // ----- Navigation logic -----
+    const navButtons = document.querySelectorAll('.nav-item');
+    let activeSection = 'beranda';
+
+    function setActive(btn) {
+      navButtons.forEach(b => b.classList.remove('bg-gray-100'));
+      btn.classList.add('bg-gray-100');
+    }
+
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const section = btn.getAttribute('data-section');
+        activeSection = section;
+        setActive(btn);
+        renderSection(section);
+        // close mobile sidebar if small screen
+        if (window.innerWidth < 768) {
+          // simple hide
+          document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+      });
+    });
+
+    // Mobile toggle
+    document.getElementById('mobile-toggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+    });
+
+    // Initialize active nav
+    // Mark first button as active
+    setActive(document.querySelector('[data-section="beranda"]'));
+
+    // ----- Renderers for each section -----
+    function renderSection(section) {
+      document.getElementById('page-title').textContent = capitalize(section);
+      if (section === 'beranda') renderBeranda();
+      if (section === 'profil') renderProfil();
+      if (section === 'matakuliah') renderMatakuliah();
+      if (section === 'produktivitas') renderProduktivitas();
+      if (section === 'tugasakhir') mountTugasAkhir();
+    }
+
+    function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+    function renderBeranda(){
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="col-span-2 bg-white p-5 rounded-2xl shadow-sm">
+            <h2 class="text-lg font-semibold mb-4">Ringkasan Akademik</h2>
+            <div class="grid grid-cols-3 gap-4">
+              <div class="p-4 border rounded-lg">
+                <div class="text-sm text-gray-500">SKS Lulus</div>
+                <div class="text-xl font-bold">${berandaData.sks_lulus}</div>
+              </div>
+              <div class="p-4 border rounded-lg">
+                <div class="text-sm text-gray-500">IPK Terakhir</div>
+                <div class="text-xl font-bold">${berandaData.ipk_akhir.toFixed(2)}</div>
+              </div>
+              <div class="p-4 border rounded-lg">
+                <div class="text-sm text-gray-500">UKT</div>
+                <div class="text-xl font-bold">Rp ${numberWithCommas(berandaData.ukt_per_semester[berandaData.ukt_per_semester.length-1])}</div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <canvas id="ipkChart" height="120"></canvas>
+            </div>
+
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl shadow-sm">
+            <h2 class="text-lg font-semibold mb-4">Distribusi Nilai</h2>
+            <canvas id="gradesChart" height="220"></canvas>
+          </div>
+        </div>
+      `;
+
+      // Render charts
+      setTimeout(()=>{
+        renderIPKChart(berandaData.ipkHistory);
+        renderGradesChart(berandaData.gradesCount);
+      }, 50);
+    }
+
+    function renderProfil(){
+      const content = document.getElementById('content');
+      content.innerHTML = `
+        <div class="bg-white p-6 rounded-2xl shadow-sm max-w-2xl">
+          <h2 class="text-lg font-semibold mb-4">Profil Mahasiswa</h2>
+          <div class="grid grid-cols-2 gap-3 text-sm text-gray-700">
+            <div><strong>Nama Lengkap</strong><div>${sampleUser.nama}</div></div>
+            <div><strong>Tanggal Lahir</strong><div>${sampleUser.tanggal_lahir}</div></div>
+            <div><strong>Tempat Lahir</strong><div>${sampleUser.tempat_lahir}</div></div>
+            <div><strong>Angkatan</strong><div>${sampleUser.angkatan}</div></div>
+            <div><strong>Jurusan</strong><div>${sampleUser.jurusan}</div></div>
+            <div><strong>Semester</strong><div>${sampleUser.semester}</div></div>
+            <div><strong>Tempat Tinggal</strong><div>${sampleUser.tempat_tinggal}</div></div>
+            <div><strong>NIM</strong><div>${sampleUser.nim}</div></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderMatakuliah(){
+      const content = document.getElementById('content');
+      // simple sample table (CRUD minimal) — data stored in localStorage
+      const courses = getCourses();
+
+      content.innerHTML = `
+        <div class="bg-white p-6 rounded-2xl shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Matakuliah (Semester 1 - 8)</h2>
+            <button id="addCourse" class="px-3 py-2 rounded-lg bg-yellow-500 text-white hover:bg-white hover:text-yellow-500">+ Tambah Matakuliah</button>
+          </div>
+
+          <div class="overflow-auto">
+            <table class="w-full text-sm table-auto">
+              <thead class="text-left text-gray-600">
+                <tr><th class="px-3 py-2">Semester</th><th class="px-3 py-2">Kode</th><th class="px-3 py-2">Mata Kuliah</th><th class="px-3 py-2">Nilai</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Aksi</th></tr>
+              </thead>
+              <tbody id="coursesBody">
+                ${courses.map((c,i)=>`
+                  <tr class="border-t"><td class="px-3 py-2">${c.semester}</td><td class="px-3 py-2">${c.kode}</td><td class="px-3 py-2">${c.nama}</td><td class="px-3 py-2">${c.nilai}</td><td class="px-3 py-2">${c.status}</td><td class="px-3 py-2"><button data-index="${i}" class="edit-btn text-blue-600 mr-2">Edit</button><button data-index="${i}" class="delete-btn text-red-600">Hapus</button></td></tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Modal (hidden) -->
+        <div id="modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden">
+          <div class="bg-white w-full max-w-md p-5 rounded-xl">
+            <h3 class="font-semibold mb-3">Tambah / Edit Matakuliah</h3>
+            <div class="space-y-2">
+              <input id="m_semester" placeholder="Semester (1-8)" class="w-full p-2 border rounded" />
+              <input id="m_kode" placeholder="Kode" class="w-full p-2 border rounded" />
+              <input id="m_nama" placeholder="Nama Mata Kuliah" class="w-full p-2 border rounded" />
+              <select id="m_nilai" class="w-full p-2 border rounded">
+                <option value="A">A</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B">B</option>
+                <option value="B-">B-</option>
+                <option value="C+">C+</option>
+                <option value="C">C</option>
+                <option value="C-">C-</option>
+                <option value="D">D</option>
+              </select>
+              <select id="m_status" class="w-full p-2 border rounded">
+                <option value="Lulus">Lulus</option>
+                <option value="Tidak Lulus">Tidak Lulus</option>
+                <option value="Aktif">Aktif</option>
+              </select>
+              <div class="flex justify-end gap-2 mt-3">
+                <button id="cancelModal" class="px-3 py-2 rounded border">Batal</button>
+                <button id="saveModal" class="px-3 py-2 rounded bg-green-600 text-white">Simpan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Attach handlers
+      document.getElementById('addCourse').addEventListener('click', ()=>openModal());
+      document.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click', (e)=>{
+        const idx = e.target.getAttribute('data-index');
+        openModal(idx);
+      }));
+      document.querySelectorAll('.delete-btn').forEach(b=>b.addEventListener('click', (e)=>{
+        const idx = e.target.getAttribute('data-index');
+        if(confirm('Hapus matakuliah ini?')){ removeCourse(idx); renderMatakuliah(); }
+      }));
+
+      document.getElementById('cancelModal').addEventListener('click', closeModal);
+      document.getElementById('saveModal').addEventListener('click', saveModal);
+
+    }
+
+    // ----- Courses storage (localStorage simple CRUD) -----
+    function getCourses(){
+      const raw = localStorage.getItem('courses_sample');
+      if(raw) return JSON.parse(raw);
+      const base = [
+        {semester:1,kode:'MAT101',nama:'Aljabar Dasar',nilai:'A',status:'Lulus'},
+        {semester:2,kode:'MAT201',nama:'Kalkulus I',nilai:'B',status:'Lulus'},
+        {semester:3,kode:'MAT301',nama:'Statistika',nilai:'B',status:'Aktif'},
+      ];
+      localStorage.setItem('courses_sample', JSON.stringify(base));
+      return base;
+    }
+    function saveCourses(arr){ localStorage.setItem('courses_sample', JSON.stringify(arr)); }
+    function removeCourse(idx){ const arr = getCourses(); arr.splice(idx,1); saveCourses(arr); }
+
+    function openModal(idx=null){
+      const modal = document.getElementById('modal');
+      modal.classList.remove('hidden');
+      const courses = getCourses();
+      if(idx !== null){
+        const c = courses[idx];
+        document.getElementById('m_semester').value = c.semester;
+        document.getElementById('m_kode').value = c.kode;
+        document.getElementById('m_nama').value = c.nama;
+        document.getElementById('m_nilai').value = c.nilai;
+        document.getElementById('m_status').value = c.status;
+        modal.setAttribute('data-edit', idx);
+      } else {
+        document.getElementById('m_semester').value = '';
+        document.getElementById('m_kode').value = '';
+        document.getElementById('m_nama').value = '';
+        document.getElementById('m_nilai').value = 'A';
+        document.getElementById('m_status').value = 'Lulus';
+        modal.removeAttribute('data-edit');
+      }
+    }
+    function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
+    function saveModal(){
+      const modal = document.getElementById('modal');
+      const editIdx = modal.getAttribute('data-edit');
+      const semester = document.getElementById('m_semester').value;
+      const kode = document.getElementById('m_kode').value;
+      const nama = document.getElementById('m_nama').value;
+      const nilai = document.getElementById('m_nilai').value;
+      const status = document.getElementById('m_status').value;
+      if(!semester || !kode || !nama){ alert('Lengkapi semua kolom'); return; }
+      const arr = getCourses();
+      const newItem = { semester: Number(semester), kode, nama, nilai, status };
+      if(editIdx !== null){ arr[editIdx] = newItem; }
+      else { arr.push(newItem); }
+      saveCourses(arr);
+      closeModal();
+      renderMatakuliah();
+    }
+
+    // ----- Charts -----
+    let ipkChart=null, gradesChart=null;
+    function renderIPKChart(data){
+      const ctx = document.getElementById('ipkChart').getContext('2d');
+      if(ipkChart) ipkChart.destroy();
+      ipkChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.map((_,i)=>`Smt ${i+1}`),
+          datasets: [{ label: 'IPK per Semester', data: data, tension: 0.3, fill: false }]
+        },
+        options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:false, suggestedMin:2.5, suggestedMax:4}} }
+      });
+    }
+
+    function renderGradesChart(counts){
+      const ctx = document.getElementById('gradesChart').getContext('2d');
+      if(gradesChart) gradesChart.destroy();
+      gradesChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels: Object.keys(counts), datasets: [{ data: Object.values(counts) }] },
+        options: { responsive:true, plugins:{legend:{position:'bottom'}} }
+      });
+    }
+
+    // ----- Utils -----
+    function numberWithCommas(x){ return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', ()=>{
+      renderSection('beranda');
+    });
+
+    // --- Global delegation to ensure Matakuliah CRUD buttons always work ---
+    document.addEventListener('click', function(e){
+      if (e.target.matches('#addCourse')) openModal();
+      if (e.target.matches('.edit-btn')) openModal(e.target.getAttribute('data-index'));
+      if (e.target.matches('.delete-btn')){
+        const idx = e.target.getAttribute('data-index');
+        if (confirm('Hapus matakuliah ini?')){ removeCourse(idx); renderMatakuliah(); }
+      }
+    });
+    
+    // ----- Produktivitas (Tasks) -----
+// Render, table, modal handlers + storage, dan update counter
+function renderProduktivitas(){
+  const content = document.getElementById('content');
+  content.innerHTML = `
+    <div class="bg-white p-6 rounded-2xl shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">Produktivitas - Tugas Perkuliahan</h2>
+        <button id="addTaskBtn" class="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-white hover:text-blue-600">+ Tambah Tugas</button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="p-4 border rounded-lg text-center">
+          <div class="text-sm text-gray-500">Total Tugas</div>
+          <div id="countTotal" class="text-2xl font-bold">0</div>
+        </div>
+        <div class="p-4 border rounded-lg text-center">
+          <div class="text-sm text-gray-500">Selesai</div>
+          <div id="countSelesai" class="text-2xl font-bold">0</div>
+        </div>
+        <div class="p-4 border rounded-lg text-center">
+          <div class="text-sm text-gray-500">Proses</div>
+          <div id="countProses" class="text-2xl font-bold">0</div>
+        </div>
+      </div>
+
+      <div class="overflow-auto">
+        <table class="w-full text-sm table-auto">
+          <thead class="text-left text-gray-600">
+            <tr><th class="px-3 py-2">Tugas</th><th class="px-3 py-2">Deadline</th><th class="px-3 py-2">Status</th><th class="px-3 py-2">Aksi</th></tr>
+          </thead>
+          <tbody id="tasksBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden">
+      <div class="bg-white w-full max-w-md p-5 rounded-xl">
+        <h3 class="font-semibold mb-3">Tambah / Edit Tugas</h3>
+        <div class="space-y-2">
+          <input id="t_judul" placeholder="Judul Tugas" class="w-full p-2 border rounded" />
+          <input id="t_deadline" type="date" class="w-full p-2 border rounded" />
+          <select id="t_status" class="w-full p-2 border rounded">
+            <option value="Proses">Proses</option>
+            <option value="Selesai">Selesai</option>
+          </select>
+          <div class="flex justify-end gap-2 mt-3">
+            <button id="cancelTaskModal" class="px-3 py-2 rounded border">Batal</button>
+            <button id="saveTaskModal" class="px-3 py-2 rounded bg-orange-600 text-white">Simpan</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // fill table and counters
+  populateTasksTable();
+  updateTaskCounts();
+
+  // attach modal buttons (these elements exist now)
+  document.getElementById('cancelTaskModal').addEventListener('click', closeTaskModal);
+  document.getElementById('saveTaskModal').addEventListener('click', saveTaskModal);
+}
+
+// populate rows
+function populateTasksTable(){
+  const tasks = getTasks();
+  const tbody = document.getElementById('tasksBody');
+  tbody.innerHTML = tasks.map((t,i)=>`
+    <tr class="border-t">
+      <td class="px-3 py-2">${escapeHtml(t.judul)}</td>
+      <td class="px-3 py-2">${t.deadline}</td>
+      <td class="px-3 py-2">${t.status}</td>
+      <td class="px-3 py-2">
+        <button data-index="${i}" class="edit-task text-blue-600 mr-2">Edit</button>
+        <button data-index="${i}" class="delete-task text-red-600">Hapus</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// update counter boxes
+function updateTaskCounts(){
+  const tasks = getTasks();
+  const total = tasks.length;
+  const selesai = tasks.filter(t=>t.status === 'Selesai').length;
+  const proses = tasks.filter(t=>t.status === 'Proses').length;
+  const elTotal = document.getElementById('countTotal');
+  const elSelesai = document.getElementById('countSelesai');
+  const elProses = document.getElementById('countProses');
+  if(elTotal) elTotal.textContent = total;
+  if(elSelesai) elSelesai.textContent = selesai;
+  if(elProses) elProses.textContent = proses;
+}
+
+// storage
+function getTasks(){
+  const raw = localStorage.getItem('tasks_sample');
+  if(raw) return JSON.parse(raw);
+  const base = [
+    {judul:'Tugas Aljabar - Soal 1', deadline: '2025-09-01', status: 'Proses'},
+    {judul:'Presentasi Statistik', deadline: '2025-08-25', status: 'Selesai'}
+  ];
+  localStorage.setItem('tasks_sample', JSON.stringify(base));
+  return base;
+}
+function saveTasks(arr){ localStorage.setItem('tasks_sample', JSON.stringify(arr)); }
+function removeTask(idx){ const arr = getTasks(); arr.splice(idx,1); saveTasks(arr); }
+
+// modal handlers
+function openTaskModal(idx=null){
+  const modal = document.getElementById('taskModal');
+  modal.classList.remove('hidden');
+  const tasks = getTasks();
+  if(idx !== null){
+    const t = tasks[idx];
+    document.getElementById('t_judul').value = t.judul;
+    document.getElementById('t_deadline').value = t.deadline;
+    document.getElementById('t_status').value = t.status;
+    modal.setAttribute('data-edit', idx);
+  } else {
+    document.getElementById('t_judul').value = '';
+    document.getElementById('t_deadline').value = '';
+    document.getElementById('t_status').value = 'Proses';
+    modal.removeAttribute('data-edit');
+  }
+}
+function closeTaskModal(){ document.getElementById('taskModal').classList.add('hidden'); }
+function saveTaskModal(){
+  const modal = document.getElementById('taskModal');
+  const editIdx = modal.getAttribute('data-edit');
+  const judul = document.getElementById('t_judul').value.trim();
+  const deadline = document.getElementById('t_deadline').value;
+  const status = document.getElementById('t_status').value;
+  if(!judul || !deadline){ alert('Lengkapi judul dan deadline'); return; }
+  const arr = getTasks();
+  const item = { judul, deadline, status };
+  if(editIdx !== null){ arr[Number(editIdx)] = item; }
+  else { arr.push(item); }
+  saveTasks(arr);
+  closeTaskModal();
+  // refresh table and counts
+  if (document.getElementById('tasksBody')) populateTasksTable();
+  updateTaskCounts();
+}
+
+// small utility
+function escapeHtml(unsafe) {
+  if(!unsafe) return '';
+  return unsafe
+       .replace(/&/g, "&amp;")
+       .replace(/</g, "&lt;")
+       .replace(/>/g, "&gt;")
+       .replace(/\\"/g, "&quot;")
+       .replace(/'/g, "&#039;");
+}
+
+// Global delegation (so edit/delete/add works without reattaching listeners manually)
+document.addEventListener('click', function(e){
+  if(e.target.matches('#addTaskBtn')) openTaskModal();
+  if(e.target.matches('.edit-task')) openTaskModal(e.target.getAttribute('data-index'));
+  if(e.target.matches('.delete-task')){
+    const idx = e.target.getAttribute('data-index');
+    if(confirm('Hapus tugas ini?')){ removeTask(idx); renderProduktivitas(); }
+  }
+});
+
+
+// ===== KODE JS: TUGAS AKHIR (checklist + progress) =====
+(() => {
+  // Daftar item
+  const TA_PROPOSAL_ITEMS = [
+    'ACC Judul Skripsi',
+    'Bab 1 - Pendahuluan',
+    'Bab 2 - Kajian Teori',
+    'Bab 3 - Metode Penelitian',
+    'Turnitin <= 20%'
+  ];
+  const TA_SKRIPSI_ITEMS = [
+    'Validasi Ahli',
+    'Penelitian Lapangan',
+    'Bab 4 - Hasil & Pembahasan',
+    'Bab 5 - Penutup',
+    'Turnitin <= 20%'
+  ];
+
+  // Mount fungsi utama ke elemen rootId (default: 'content')
+  function mountTugasAkhir(rootId = 'content') {
+    const root = document.getElementById(rootId);
+    if (!root) {
+      console.warn(`[mountTugasAkhir] Elemen dengan id "${rootId}" tidak ditemukan.`);
+      return;
+    }
+
+    // HTML layout (simple, responsive dengan tailwind classes bila tersedia)
+    root.innerHTML = `
+      <div class="space-y-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold">Progres Proposal</h2>
+            <div id="proposal-status" class="text-sm text-gray-600">Status: <span class="font-medium">-</span></div>
+          </div>
+
+          <div class="mt-4 space-y-3" id="proposal-checks"></div>
+
+          <div class="mt-4">
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+              <div id="proposal-bar" class="h-3 rounded-full transition-all" style="width:0%; background:#f59e0b;"></div>
+            </div>
+            <div class="text-sm text-gray-500 mt-2">Progress: <span id="proposal-percent">0%</span></div>
+          </div>
+
+          <div class="mt-3 flex gap-2">
+            <button id="proposal-reset" class="px-3 py-1 text-sm border rounded">Reset</button>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold">Progres Skripsi</h2>
+            <div id="skripsi-status" class="text-sm text-gray-600">Status: <span class="font-medium">-</span></div>
+          </div>
+
+          <div class="mt-4 space-y-3" id="skripsi-checks"></div>
+
+          <div class="mt-4">
+            <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+              <div id="skripsi-bar" class="h-3 rounded-full transition-all" style="width:0%; background:#10b981;"></div>
+            </div>
+            <div class="text-sm text-gray-500 mt-2">Progress: <span id="skripsi-percent">0%</span></div>
+          </div>
+
+          <div class="mt-3 flex gap-2">
+            <button id="skripsi-reset" class="px-3 py-1 text-sm border rounded">Reset</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // init checklists
+    initChecklist('proposal', TA_PROPOSAL_ITEMS, 'ta_proposal_checks');
+    initChecklist('skripsi', TA_SKRIPSI_ITEMS, 'ta_skripsi_checks');
+
+    // reset buttons
+    document.getElementById('proposal-reset').addEventListener('click', () => {
+      if (confirm('Reset semua checklist Proposal?')) {
+        localStorage.removeItem('ta_proposal_checks');
+        initChecklist('proposal', TA_PROPOSAL_ITEMS, 'ta_proposal_checks');
+      }
+    });
+    document.getElementById('skripsi-reset').addEventListener('click', () => {
+      if (confirm('Reset semua checklist Skripsi?')) {
+        localStorage.removeItem('ta_skripsi_checks');
+        initChecklist('skripsi', TA_SKRIPSI_ITEMS, 'ta_skripsi_checks');
+      }
+    });
+  }
+
+  // Inisialisasi checklist generic
+  function initChecklist(prefix, items, storageKey) {
+    const container = document.getElementById(`${prefix}-checks`);
+    if (!container) return;
+
+    // restore state dari localStorage (array boolean)
+    const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    const state = items.map((_, i) => saved[i] === true);
+
+    function updateUI() {
+      // Render checkboxes
+      container.innerHTML = items.map((label, i) => {
+        const checked = state[i] ? 'checked' : '';
+        // pakai id unik untuk label->input accessibility
+        const id = `ta-${prefix}-${i}`;
+        return `
+          <div class="flex items-center gap-3">
+            <input id="${id}" type="checkbox" data-idx="${i}" ${checked} class="ta-checkbox" />
+            <label for="${id}" class="text-sm cursor-pointer">${label}</label>
+          </div>
+        `;
+      }).join('');
+
+      // Calculate progress
+      const done = state.filter(Boolean).length;
+      const percent = Math.round((done / items.length) * 100);
+      const barEl = document.getElementById(`${prefix}-bar`);
+      const percentEl = document.getElementById(`${prefix}-percent`);
+      const statusEl = document.getElementById(`${prefix}-status`);
+
+      if (barEl) {
+        barEl.style.width = `${percent}%`;
+        // color hint: complete -> green, partial -> amber
+        if (percent === 100) {
+          barEl.style.background = '#16a34a'; // green
+        } else if (percent >= 60) {
+          barEl.style.background = '#f59e0b'; // amber
+        } else {
+          barEl.style.background = '#ef4444'; // red-ish
+        }
+      }
+      if (percentEl) percentEl.textContent = percent + '%';
+      if (statusEl) {
+        const text = percent === 100 ? 'Selesai' : 'In Progress';
+        statusEl.querySelector('span').textContent = text;
+        statusEl.classList.toggle('text-green-600', percent === 100);
+      }
+
+      // Attach change handlers AFTER render
+      container.querySelectorAll('.ta-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          const idx = Number(e.target.getAttribute('data-idx'));
+          state[idx] = e.target.checked;
+          localStorage.setItem(storageKey, JSON.stringify(state));
+          updateUI(); // re-render
+        });
+      });
+    }
+
+    // initial render
+    updateUI();
+  }
+
+  // expose function to window so kamu bisa panggil mountTugasAkhir() dari luar
+  window.mountTugasAkhir = mountTugasAkhir;
+})();
+
+// ================== contoh pemanggilan ==================
+// Panggil setelah DOM siap:
+// document.addEventListener('DOMContentLoaded', () => mountTugasAkhir('content'));
+
+    
+  </script>
+</body>
+</html>
